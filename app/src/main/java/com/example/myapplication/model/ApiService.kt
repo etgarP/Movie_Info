@@ -3,6 +3,7 @@ package com.example.movieapp.model
 import com.example.myapplication.token
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -23,9 +24,9 @@ interface ApiService {
         @Query("page") page: Int = 1
     ): MovieResponse
 
-    @GET("movie")
+    @GET("movie/{movie_id}")
     suspend fun getMovieDetails(
         @Header("Authorization") authHeader: String = token,
-        @Query("movie_id") movieId: Int = 950396,
-    )
+        @Path("movie_id") movieId: Int = 950396,
+    ) : MovieDetails
 }

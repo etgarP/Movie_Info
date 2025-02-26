@@ -24,4 +24,13 @@ class MovieRepository @Inject constructor(private val apiService: ApiService) {
             Result.failure(e)
         }
     }
+
+    suspend fun getMovieDetails(moveId: Int): Result<MovieDetails> {
+        return try {
+            val response = apiService.getMovieDetails(movieId = moveId)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

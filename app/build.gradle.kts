@@ -54,7 +54,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
     // AndroidX Hilt integration
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // ViewModel and Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
@@ -67,6 +67,9 @@ dependencies {
 
     // showing images
     implementation ("io.coil-kt:coil-compose:2.4.0")
+
+    implementation (libs.androidx.material.icons.extended)
+
 
     // Existing dependencies
     implementation(libs.androidx.core.ktx)
@@ -84,6 +87,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation (libs.androidx.navigation.compose)
 
     // Hilt dependencies
     implementation("com.google.dagger:hilt-android:2.51.1")

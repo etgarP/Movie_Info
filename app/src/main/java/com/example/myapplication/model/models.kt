@@ -14,13 +14,13 @@ data class Movie(
 )
 
 data class MovieDetails(
-    val posterPath: String?,
-    val backdropPath: String?,
+    val poster_path: String?,
+    val backdrop_path: String?,
     val title: String,
     val tagline: String?,
-    val voteAverage: Double,
-    val voteCount: Int,
-    val releaseDate: String,
+    val vote_average: Double,
+    val vote_count: Int,
+    val release_date: String,
     val runtime: Int,
     val genres: List<Genre>,
     val overview: String
