@@ -43,10 +43,8 @@ com.example.myapplication
 
 ## Setup Instructions
 
-To authenticate the API requests, please create a file named `token.kt` inside the `com.example.myapplication` package. In that file, add the following code with your actual token:
+To authenticate the API requests, please create a file named token.kt inside the com.example.myapplication package. In that file, add the following code with your actual token:
 
 ```kotlin
-import com.example.myapplication.token
-
 val token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJh..."
 ```
