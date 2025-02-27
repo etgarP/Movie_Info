@@ -16,9 +16,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,54 +37,55 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import com.example.movieapp.model.Genre
 import com.example.movieapp.model.MovieDetails
 import com.example.movieapp.viewmodel.MovieViewModel
-import com.example.myapplication.view.moviesbygenre.ImageFromUrl
+import com.example.myapplication.R
 import com.example.myapplication.view.moviesbygenre.RatingDisplay
 
+// the screen that gives extra details about a movie, nav host navigates to it on click
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MovieDetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: MovieViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+
 ) {
     val movieDetails = viewModel.selectedMovie.collectAsState()
-    Column {
-
-
-        Button(onClick = {viewModel.selectMovie(950396)}) {
-            Text("hello")
-        }
-    }
-
-
     Scaffold(
         topBar = {TransparentTopBar(onBack)},
         modifier = modifier.fillMaxSize(),
-        containerColor = Color.Transparent
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
-        movieDetails.value?.let {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-            ) {
+        movieDetails.value?.let { // shows the page once movie details is populated
+            Column {
                 Backdrop(movieDetails = it)
-                FirstDetails(movieDetails = it)
-                HorizontalDivider(Modifier.padding(horizontal = 10.dp))
-                OverView(movieDetails = it)
-                HorizontalDivider(Modifier.padding(horizontal = 10.dp))
-                FinalDetails(movieDetails = it)
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    FirstDetails(movieDetails = it)
+                    HorizontalDivider(Modifier.padding(horizontal = 10.dp))
+                    OverView(movieDetails = it)
+                    HorizontalDivider(Modifier.padding(horizontal = 10.dp))
+                    FinalDetails(movieDetails = it)
+                }
             }
+
         }
     }
 }
 
+// transparent top bar for aesthetics with back button
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransparentTopBar(onBack: () -> Unit) {
@@ -93,7 +93,7 @@ fun TransparentTopBar(onBack: () -> Unit) {
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
                     tint = Color.White
                 )
@@ -109,6 +109,7 @@ fun TransparentTopBar(onBack: () -> Unit) {
 }
 
 
+// shows the back drop of rounded bottom corners
 @Composable
 fun Backdrop(modifier: Modifier = Modifier, movieDetails: MovieDetails) {
     val path = movieDetails.backdrop_path?: ""
@@ -123,10 +124,25 @@ fun Backdrop(modifier: Modifier = Modifier, movieDetails: MovieDetails) {
         shadowElevation = 10.dp,
         color = MaterialTheme.colorScheme.primary
     ) {
-        ImageFromUrl("original/${path}")
+        ImageFromUrlBackdrop("w780/${path}")
     }
 }
 
+// gets image from the url of the backdrop
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun ImageFromUrlBackdrop(imageUrl: String) {
+    val context = LocalContext.current
+    val placeholderDrawable = context.getDrawable(R.drawable.img_1)
+    GlideImage(
+        contentScale = ContentScale.FillWidth,
+        model = "https://image.tmdb.org/t/p/$imageUrl",
+        loading = placeholder(placeholderDrawable),
+        contentDescription = "backdrop"
+    )
+}
+
+// shows the name of the movie + year + time of the movie + rating
 @Composable
 fun FirstDetails(modifier: Modifier = Modifier, movieDetails: MovieDetails) {
     val year = movieDetails.release_date.split("-")[0]
@@ -149,6 +165,7 @@ fun FirstDetails(modifier: Modifier = Modifier, movieDetails: MovieDetails) {
     }
 }
 
+// shows the overview
 @Composable
 fun OverView(modifier: Modifier = Modifier, movieDetails: MovieDetails) {
     ContentWithTitle(modifier, title = "Overview") {
@@ -156,13 +173,15 @@ fun OverView(modifier: Modifier = Modifier, movieDetails: MovieDetails) {
     }
 }
 
+// shows the genres as chips
 @Composable
 fun FinalDetails(modifier: Modifier = Modifier, movieDetails: MovieDetails) {
-    ContentWithTitle(modifier, title = "Overview") {
+    ContentWithTitle(modifier, title = "Genres") {
         GenreChips(genres = movieDetails.genres)
     }
 }
 
+// basically just has a title and content
 @Composable
 fun ContentWithTitle(
     modifier: Modifier = Modifier, title: String = "",
@@ -175,6 +194,7 @@ fun ContentWithTitle(
     }
 }
 
+// takes a list of genres and returns chips for them
 @Composable
 fun GenreChips(genres: List<Genre>) {
     // Create a horizontal scrollable row
@@ -191,6 +211,7 @@ fun GenreChips(genres: List<Genre>) {
     }
 }
 
+// shows a single chip
 @Composable
 fun GenreChip(genre: Genre) {
     Card(

@@ -10,6 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+// hilt modules for retrofit and the api service for DI
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {

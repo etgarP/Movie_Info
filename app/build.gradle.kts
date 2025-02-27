@@ -87,7 +87,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation (libs.androidx.navigation.compose)
+
+    implementation (libs.compose)
 
     // Hilt dependencies
     implementation("com.google.dagger:hilt-android:2.51.1")

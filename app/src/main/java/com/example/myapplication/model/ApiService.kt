@@ -6,13 +6,16 @@ import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+// defines the queries to the database
 interface ApiService {
+    // getting a list of genres
     @GET("genre/movie/list")
     suspend fun getGenres(
         @Header("Authorization") authHeader: String = token,
         @Query("language") language: String = "en-US"
     ): GenreResponse
 
+    // getting a list of movies by genre and by page - 1, 2, ...
     @GET("discover/movie")
     suspend fun getMoviesByGenre(
         @Header("Authorization") authHeader: String = token,
@@ -24,6 +27,7 @@ interface ApiService {
         @Query("page") page: Int = 1
     ): MovieResponse
 
+    // getting extra details about the movie
     @GET("movie/{movie_id}")
     suspend fun getMovieDetails(
         @Header("Authorization") authHeader: String = token,

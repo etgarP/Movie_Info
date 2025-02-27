@@ -34,41 +34,47 @@ import com.example.movieapp.model.Genre
 import com.example.movieapp.model.Movie
 import com.example.movieapp.viewmodel.MovieViewModel
 
+// requested screen showing the popular movies by genre
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoviesByGenreScreen(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    viewModel: MovieViewModel
+    viewModel: MovieViewModel,
+    genreIndex: Int,
+    setGenreIndex: (Int) -> Unit,
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            CenterAlignedTopAppBar(title = { Text("Movies are fun") })
-        }
-    ) { paddingValues ->
-        MoviesByGenre(modifier = Modifier.padding(paddingValues), onClick = onClick, viewModel = viewModel)
+    Column(modifier) { // shows top bar and the content - movies and tabs
+        CenterAlignedTopAppBar(title = { Text("Movies are fun") })
+        MoviesByGenre(
+            onClick = onClick,
+            viewModel = viewModel,
+            selectedTabIndex = genreIndex,
+            setGenreIndex = setGenreIndex
+        )
     }
 }
 
+// shows the tabs and movies
 @Composable
 fun MoviesByGenre(
     modifier: Modifier = Modifier,
     viewModel: MovieViewModel,
     onClick: () -> Unit,
+    selectedTabIndex: Int,
+    setGenreIndex: (Int) -> Unit,
 ) {
     val genres by viewModel.genres.collectAsState()
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val movies by viewModel.movies.collectAsState()
 
     Column (modifier = modifier) {
         if (genres.isNotEmpty()) {
-            ScrollableTabs(selectedTabIndex, genres, setSelectedTabIndex = {
-                selectedTabIndex = it
+            ScrollableTabs(selectedTabIndex, genres, setSelectedTabIndex = { // tabs
+                setGenreIndex(it)
             }, viewModel = viewModel)
         }
         for (i in genres.indices) {
-            AnimatedVisibility(
+            AnimatedVisibility( // movies with transition animation
                 visible = selectedTabIndex == i,
                 enter = fadeIn(tween()),
                 exit = fadeOut(tween())
@@ -80,6 +86,7 @@ fun MoviesByGenre(
     }
 }
 
+// shows the genre tabs
 @Composable
 fun ScrollableTabs(
     selectedTabIndex: Int,
@@ -116,7 +123,7 @@ fun ScrollableTabs(
     }
 }
 
-
+// shows the movies by genre
 @Composable
 fun MoviesByGenre(
     modifier: Modifier = Modifier,
@@ -138,7 +145,7 @@ fun MoviesByGenre(
             })
         }
     }
-    LaunchedEffect(scrollState) {
+    LaunchedEffect(scrollState) { // loads in the next page when scrolled all the way down
         snapshotFlow { scrollState.canScrollForward }
             .collect { canScrollForward ->
                 if (!canScrollForward) {

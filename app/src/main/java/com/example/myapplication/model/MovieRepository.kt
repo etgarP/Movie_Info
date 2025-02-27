@@ -4,6 +4,7 @@ import com.example.myapplication.token
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// repository for the api calls (matching function to the api service)
 @Singleton
 class MovieRepository @Inject constructor(private val apiService: ApiService) {
 

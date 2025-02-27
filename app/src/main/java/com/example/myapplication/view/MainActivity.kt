@@ -11,12 +11,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.animation.ExitTransition
+
 import androidx.compose.runtime.Composable
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,91 +34,46 @@ import com.example.myapplication.view.moviedetails.MovieDetailsScreen
 import com.example.myapplication.view.moviesbygenre.MoviesByGenreScreen
 import dagger.hilt.android.AndroidEntryPoint
 
-
+// starting point
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                MainScreen()
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    MainScreen(modifier = Modifier.padding(innerPadding))
+                }
             }
         }
     }
 }
 
+// stores the nav host with the two screens - the genre screen, and the details screen for
+// a chosen movie
 @Composable
 fun MainScreen(modifier: Modifier = Modifier) {
     val viewModel: MovieViewModel = hiltViewModel()
-    val navController = rememberNavController()
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-    ) { paddingValues ->
-        // the navigation host
-        NavHost(
-            navController = navController,
-            startDestination = "home",
-            modifier = modifier.padding(paddingValues)
-        ) {
-            composable(
-                route = "home",
-                exitTransition = {
-                    when (targetState.destination.route) {
-                        "details" -> scaleOutOfContainer(direction = Direction.OUTWARDS)
-                        else -> null
-                    }
-                }
-            ) { MoviesByGenreScreen(
-                onClick = { navController.navigate("details") },
-                viewModel = viewModel
+    val navController = rememberNavController() // assists with transitions between screens
+    var genreIndex by remember ({ mutableIntStateOf(0) }) // helps with consistent transitions
+    NavHost(
+        navController = navController,
+        startDestination = "home",
+        modifier = modifier
+    ) {
+        composable(
+            route = "home",
+        ) { MoviesByGenreScreen( // on click of a movie goes to details
+            onClick = { navController.navigate("details") },
+            viewModel = viewModel,
+            genreIndex = genreIndex,
+            setGenreIndex = {index -> genreIndex = index}
+        ) }
+        composable("details") {
+            MovieDetailsScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = viewModel,
             ) }
-            composable("details",
-                enterTransition = {
-                    when (initialState.destination.route) {
-                        "home" -> scaleIntoContainer(direction = Direction.INWARDS)
-                        else -> null
-                    }
-                },
-                exitTransition = {
-                    when (targetState.destination.route) {
-                        "home" -> scaleOutOfContainer(direction = Direction.OUTWARDS)
-                        else -> null
-                    }
-                }) { MovieDetailsScreen(
-                    onBack = { navController.popBackStack() },
-                    viewModel = viewModel
-                ) }
-        }
     }
 }
-
-enum class Direction {
-    INWARDS,
-    OUTWARDS
-}
-
-// scan in and out animation to make using them shorter and easier
-fun scaleIntoContainer(
-    direction: Direction = Direction.INWARDS,
-    initialScale: Float = if (direction == Direction.OUTWARDS) 0.9f else 1.1f
-): EnterTransition {
-    return scaleIn(
-        animationSpec = tween(220, delayMillis = 90),
-        initialScale = initialScale
-    ) + fadeIn(animationSpec = tween(220, delayMillis = 90))
-}
-
-fun scaleOutOfContainer(
-    direction: Direction = Direction.OUTWARDS,
-    targetScale: Float = if (direction == Direction.INWARDS) 0.9f else 1.1f
-): ExitTransition {
-    return scaleOut(
-        animationSpec = tween(
-            durationMillis = 220,
-            delayMillis = 90
-        ), targetScale = targetScale
-    ) + fadeOut(tween(delayMillis = 90))
-}
-
